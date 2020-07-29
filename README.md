@@ -17,7 +17,7 @@ Copy github repo to a local file.
 Install important libraries. 
 
 ```bash
-pip -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Deployment
