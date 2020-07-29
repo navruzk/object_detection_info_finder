@@ -1,5 +1,5 @@
 numpy
-tensorflow==2.0.0
+tensorflow==2.0.1
 tensorflow_hub
 tensorflow-gpu
 matplotlib
