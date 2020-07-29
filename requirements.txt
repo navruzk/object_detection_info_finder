@@ -1,11 +1,10 @@
 numpy
-tensorflow
+tensorflow==2.0.0
 tensorflow_hub
+tensorflow-gpu
 matplotlib
-tempfile
-six
-PIL
-PyQt5requests
+PILLOW
+PyQt5
+requests
 selenium
 bs4
-time
