@@ -4,7 +4,7 @@ ODIF detects object from the picture and finds relevant information by reverse g
 
 ## Getting Started
 
-Detailed instructions' [link](https://navruzbek1992.github.io/data_science_challenges/projects/object_detection.html)
+Detailed instruction's [link](https://navruzbek1992.github.io/data_science_challenges/projects/object_detection.html)
 
 ### Prerequisites
 
