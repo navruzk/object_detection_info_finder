@@ -20,6 +20,8 @@ Install important libraries.
 pip install -r requirements.txt
 ```
 
+Install [Microsoft Visual Studio](https://visualstudio.microsoft.com/downloads/) since it is requried for running tensorflow. 
+
 ## Deployment
 
 From CMD run 
