@@ -1,0 +1,11 @@
+numpy
+tensorflow
+tensorflow_hub
+matplotlib
+tempfile
+six
+PIL
+PyQt5requests
+selenium
+bs4
+time
