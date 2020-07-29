@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 Install [Microsoft Visual Studio](https://visualstudio.microsoft.com/downloads/) since it is requried for running tensorflow. 
 
-Install [Selenium for chrome](https://chromedriver.chromium.org/downloads). It is required for google search.
+Install [Chrome driver](https://chromedriver.chromium.org/downloads) for selenium. It is required for google search.
 
 ## Deployment
 
