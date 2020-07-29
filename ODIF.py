@@ -21,6 +21,8 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup as bs
 import time
+import tarfile
+import os
 
 
 class ObjectDetector:
@@ -161,7 +163,7 @@ class ObjectDetector:
 
 
 class GoogleSearch:
-    def object_name_finder(filePath):
+    def object_name_finder(filePath, chrome_driver_path):
         searchUrl = "http://www.google.com/searchbyimage/upload"
         multipart = {
             "encoded_image": (filePath, open(filePath, "rb")),
@@ -170,9 +172,10 @@ class GoogleSearch:
         response = requests.post(searchUrl, files=multipart, allow_redirects=False)
         fetchUrl = response.headers["Location"]
 
+
         ##give the path to chromedriver
         browser = Chrome(
-            executable_path=r"...\chromedriver_win32\chromedriver.exe"
+            executable_path = chrome_driver_path
         )
         browser.get(fetchUrl)
         soup = bs(browser.page_source, "html.parser")
@@ -208,11 +211,17 @@ if __name__ == "__main__":
     # "https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1"
     # "https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1"
 
-    module_handle = (
-        "https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1"
-    )
-    detector = hub.load(module_handle).signatures["default"]
+    downloaded_model_path = input('Give the path for downloaded tensorflow model: ')
 
+    try:
+        os.mkdir('tf_model')
+
+    tar = tarfile.open(downloaded_model_path, "r:gz")
+    tar.extractall('tf_model')
+    tar.close()
+
+    detector = hub.load('tf_model').signatures["default"]
+    
     image_url = input("Plz give me the url for the image: ")
 
     downloaded_image_path = ObjectDetector.download_and_resize_image(
@@ -257,7 +266,9 @@ if __name__ == "__main__":
         im1 = image_pil.crop((left, top, right, bottom))
         filename = ObjectDetector.save_processed_image(np.array(im1))
 
-        text = GoogleSearch.object_name_finder(filename)
+        chrome_driver_path = input('Give the path for chrome driver: ')
+        
+        text = GoogleSearch.object_name_finder(filename, chrome_driver_path)
         print("Your object is: " + text)
 
         path = filename
