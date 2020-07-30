@@ -35,7 +35,7 @@ python ODIF.py
 
 ## Authors
 
-* **Navruz**  - [navruzbek](https://github.com/navruzbek1992)
+[navruzbek](https://github.com/navruzbek1992)
 
 ## License
 
