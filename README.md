@@ -30,7 +30,7 @@ From CMD run
 
 
 ```bash
-python ODIF.py
+python odif.py
 ```
 
 ## Authors
