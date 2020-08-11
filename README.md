@@ -1,6 +1,8 @@
 # Object Detector and Info Finder
 
-ODIF detects object from the picture and finds relevant information by reverse googling.
+ODIF detects object from the picture and finds the relevant information from clearnet. 
+
+Objects are first detected through tensorflow's pretrained inception network and the chosen object is used to find more detailed information.
 
 ## Getting Started
 
@@ -8,7 +10,7 @@ Detailed instruction's [link](https://navruzbek1992.github.io/data_science_chall
 
 ### Prerequisites
 
-Basic knowledge of tensorflow pretrained models in order to be able to change and make the detector more robust. 
+Basic knowledge of tensorflow pretrained models is needed in order to be able to change and make the detector more robust. 
 
 ### Installing
 
@@ -35,7 +37,7 @@ python odif.py
 
 ## Authors
 
-[navruzbek](https://github.com/navruzbek1992)
+[navruz](https://github.com/navruzbek1992)
 
 ## License
 
