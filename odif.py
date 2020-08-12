@@ -23,6 +23,8 @@ from bs4 import BeautifulSoup as bs
 import time
 import tarfile
 import os
+import numpy as np
+import cv2
 
 
 class ObjectDetector:
@@ -172,11 +174,8 @@ class GoogleSearch:
         response = requests.post(searchUrl, files=multipart, allow_redirects=False)
         fetchUrl = response.headers["Location"]
 
-
         ##give the path to chromedriver
-        browser = Chrome(
-            executable_path = chrome_driver_path
-        )
+        browser = Chrome(executable_path=chrome_driver_path)
         browser.get(fetchUrl)
         soup = bs(browser.page_source, "html.parser")
         browser.quit()
@@ -205,73 +204,87 @@ class Menu(QMainWindow):
 
 if __name__ == "__main__":
 
-    # Pick an object detection module and apply on the downloaded image. Modules:
-    # * **FasterRCNN+InceptionResNet V2**: high accuracy,
-    # * **ssd+mobilenet V2**: small and fast.
-    # "https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1"
-    # "https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1"
+    while True:
 
-    downloaded_model_path = input('Give the path for downloaded tensorflow model: ')
+        # Pick an object detection module and apply on the downloaded image. Modules:
+        # * **FasterRCNN+InceptionResNet V2**: high accuracy,
+        # * **ssd+mobilenet V2**: small and fast.
+        # "https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1"
+        # "https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1"
 
-    try:
-        os.mkdir('tf_model')
+        model_status = input("You have already downloaded and unzpipped the model? ")
+        driver_status = input("You have already downloaded browser driver? ")
 
-    tar = tarfile.open(downloaded_model_path, "r:gz")
-    tar.extractall('tf_model')
-    tar.close()
+        if not eval(driver_status):
+            print("Plz download the browser driver")
+            chrome_driver_path = input("Give the path for downloaded driver.exe: ")
 
-    detector = hub.load('tf_model').signatures["default"]
-    
-    image_url = input("Plz give me the url for the image: ")
+        if not eval(model_status):
+            print(
+                "Plz download the model from https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1"
+            )
+            downloaded_model_path = input(
+                "Give the path for downloaded tensorflow model: "
+            )
 
-    downloaded_image_path = ObjectDetector.download_and_resize_image(
-        image_url, 1280, 856, True
-    )
-    image_with_boxes, result = ObjectDetector.run_detector(
-        detector, downloaded_image_path
-    )
-    filename = ObjectDetector.save_processed_image(image_with_boxes)
+            if not os.path.isdir("tf_model"):
+                os.mkdir("tf_model")
+            tar_file = tarfile.open(downloaded_model_path, "r:gz")
+            tar_file.extractall("tf_model")
+            tar_file.close()
 
-    result_1 = [
-        (a, b, c)
-        for a, b, c in zip(
-            result["detection_scores"],
-            result["detection_class_entities"],
-            result["detection_boxes"],
+        detector = hub.load("tf_model").signatures["default"]
+        image_url = input("Plz give me the url for the image: ")
+
+        downloaded_image_path = ObjectDetector.download_and_resize_image(
+            image_url, 1280, 856, True
         )
-        if a >= 0.5
-    ]
-
-    keywords = [input("What object you looking for? ")]
-    keywords = [a.lower() for a in keywords]
-    result_2 = [a for a in result_1 if a[1].decode().lower() in keywords]
-
-    if len(result_2) == 0:
-        print("Picture does not have a clear image of objects")
-
-    else:
-        small_pics = [a for a in result_2 if a[0] == max([a[0] for a in result_2])]
-        ymin, xmin, ymax, xmax = tuple(small_pics[0][2])
-
-        img = ObjectDetector.load_img(downloaded_image_path)
-
-        image_pil = Image.fromarray(np.uint8(img.numpy())).convert("RGB")
-        im_width, im_height = image_pil.size
-        (left, right, top, bottom) = (
-            xmin * im_width,
-            xmax * im_width,
-            ymin * im_height,
-            ymax * im_height,
+        image_with_boxes, result = ObjectDetector.run_detector(
+            detector, downloaded_image_path
         )
-        im1 = image_pil.crop((left, top, right, bottom))
-        filename = ObjectDetector.save_processed_image(np.array(im1))
+        filename = ObjectDetector.save_processed_image(image_with_boxes)
 
-        chrome_driver_path = input('Give the path for chrome driver: ')
-        
-        text = GoogleSearch.object_name_finder(filename, chrome_driver_path)
-        print("Your object is: " + text)
+        result_1 = [
+            (a, b, c)
+            for a, b, c in zip(
+                result["detection_scores"],
+                result["detection_class_entities"],
+                result["detection_boxes"],
+            )
+            if a >= 0.2
+        ]
+        print(result["detection_class_entities"])
 
-        path = filename
-        app = QApplication(sys.argv)
-        ex = Menu(path)
-        sys.exit(app.exec_())
+        keywords = [input("What object you looking for? ")]
+        keywords = [a.lower() for a in keywords]
+        result_2 = [a for a in result_1 if a[1].decode().lower() in keywords]
+
+        if len(result_2) == 0:
+            print("Picture does not have a clear image of objects")
+
+        else:
+            small_pics = [a for a in result_2 if a[0] == max([a[0] for a in result_2])]
+            ymin, xmin, ymax, xmax = tuple(small_pics[0][2])
+
+            img = ObjectDetector.load_img(downloaded_image_path)
+
+            image_pil = Image.fromarray(np.uint8(img.numpy())).convert("RGB")
+            im_width, im_height = image_pil.size
+            (left, right, top, bottom) = (
+                xmin * im_width,
+                xmax * im_width,
+                ymin * im_height,
+                ymax * im_height,
+            )
+            im1 = image_pil.crop((left, top, right, bottom))
+            filename = ObjectDetector.save_processed_image(np.array(im1))
+
+            text = GoogleSearch.object_name_finder(filename, chrome_driver_path)
+            print("Your object is: " + text)
+
+            path = filename
+            img = cv2.imread(filename)
+
+            cv2.imshow("Image", img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
